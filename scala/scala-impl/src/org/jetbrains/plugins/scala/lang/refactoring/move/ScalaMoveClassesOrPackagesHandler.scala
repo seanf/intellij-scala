@@ -3,7 +3,6 @@ package lang.refactoring.move
 
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
-import javax.swing._
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.{DialogWrapper, Messages}
@@ -11,10 +10,10 @@ import com.intellij.psi.{PsiClass, PsiDirectory, PsiElement}
 import com.intellij.refactoring.move.MoveCallback
 import com.intellij.refactoring.move.moveClassesOrPackages._
 import com.intellij.refactoring.util.{CommonRefactoringUtil, TextOccurrencesUtil}
-import com.intellij.refactoring.{HelpID, JavaRefactoringSettings, MoveDestination}
+import com.intellij.refactoring.{JavaRefactoringSettings, MoveDestination}
+import javax.swing._
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.impl.ScalaFileImpl
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 
 import scala.collection.JavaConverters._
@@ -39,9 +38,8 @@ class ScalaMoveClassesOrPackagesHandler extends JavaMoveClassesOrPackagesHandler
         }
       case _ =>
     }
-    ScalaFileImpl.performMoveRefactoring {
-      super.doMove(project, elements, targetContainer, callback)
-    }
+
+    super.doMove(project, elements, targetContainer, callback)
   }
 
   override def canMove(elements: Array[PsiElement], targetContainer: PsiElement): Boolean = {
@@ -92,9 +90,7 @@ class ScalaMoveClassesOrPackagesHandler extends JavaMoveClassesOrPackagesHandler
         }
       }
 
-    ScalaFileImpl.performMoveRefactoring {
-      moveDialog.show()
-    }
+    moveDialog.show()
   }
 
   @NotNull

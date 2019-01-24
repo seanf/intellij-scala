@@ -13,7 +13,7 @@ import com.intellij.refactoring.move.moveClassesOrPackages.{MoveClassesOrPackage
 import com.intellij.testFramework.{PlatformTestUtil, PsiTestUtil}
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
 import org.jetbrains.plugins.scala.util.TestUtils
 
@@ -142,10 +142,10 @@ class ScalaMoveClassTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     val aPackage: PsiPackage = JavaPsiFacade.getInstance(getProjectAdapter).findPackage(newPackageName)
     val dirs: Array[PsiDirectory] = aPackage.getDirectories(GlobalSearchScope.moduleScope(getModuleAdapter))
     assert(dirs.length == 1)
-    ScalaFileImpl.performMoveRefactoring {
-      new MoveClassesOrPackagesProcessor(getProjectAdapter, classes.toArray,
-        new SingleSourceRootMoveDestination(PackageWrapper.create(JavaDirectoryService.getInstance.getPackage(dirs(0))), dirs(0)), true, true, null).run()
-    }
+    new MoveClassesOrPackagesProcessor(getProjectAdapter, classes.toArray,
+      new SingleSourceRootMoveDestination(PackageWrapper.create(JavaDirectoryService.getInstance.getPackage(dirs(0))),dirs(0)),
+      true, true, null
+    ).run()
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
   }
 

@@ -42,7 +42,6 @@ import org.jetbrains.plugins.scala.worksheet.ammonite.AmmoniteUtil
 
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 
 class ScalaFileImpl(viewProvider: FileViewProvider,
                     override val getFileType: LanguageFileType = ScalaFileType.INSTANCE)
@@ -339,24 +338,23 @@ class ScalaFileImpl(viewProvider: FileViewProvider,
 
   override def getClasses: Array[PsiClass] =
     if (isScriptFile || isWorksheetFile) PsiClass.EMPTY_ARRAY
+    else this.typeDefinitions.toArray
+
+  /*
+    This Method was previously integrated into getClasses and,
+    depending on a global variable, added to `this.typeDefinitions`
+    as result of getClasses. This caused problems in production.
+
+    // todo: remove this method
+   */
+  def getFakeClasses: Seq[PsiClass] =
+    if (isScriptFile || isWorksheetFile) PsiClass.EMPTY_ARRAY
     else {
-      val definitions = this.typeDefinitions
-
-      if (ScalaFileImpl.isDuringMoveRefactoring) definitions.toArray
-      else {
-        val arrayBuffer = mutable.ArrayBuffer.empty[PsiClass]
-        for (definition <- definitions) {
-          val toAdd = definition :: (definition match {
-            case o: ScObject => o.fakeCompanionClass.toList
-            case t: ScTrait =>
-              t.fakeCompanionClass :: t.fakeCompanionModule.toList
-            case c: ScClass => c.fakeCompanionModule.toList
-            case _ => Nil
-          })
-
-          arrayBuffer ++= toAdd
-        }
-        arrayBuffer.toArray
+      this.typeDefinitions.flatMap {
+        case o: ScObject => o.fakeCompanionClass.toList
+        case t: ScTrait =>  t.fakeCompanionClass :: t.fakeCompanionModule.toList
+        case c: ScClass => c.fakeCompanionModule.toList
+        case _ => Nil
       }
     }
 
@@ -528,19 +526,4 @@ object ScalaFileImpl {
   }
 
   def toVector(name: String): List[String] = if (name.isEmpty) Nil else name.split('.').toList
-
-  private[this] var duringMoveRefactoring: Boolean = false
-
-  private def isDuringMoveRefactoring: Boolean = duringMoveRefactoring
-
-  def performMoveRefactoring(body: => Unit) {
-    synchronized {
-      try {
-        duringMoveRefactoring = true
-        body
-      } finally {
-        duringMoveRefactoring = false
-      }
-    }
-  }
 }

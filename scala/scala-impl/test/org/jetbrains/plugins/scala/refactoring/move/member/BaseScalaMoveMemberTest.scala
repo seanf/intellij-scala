@@ -6,7 +6,6 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter.
 import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAdapter
 import org.jetbrains.plugins.scala.extensions.PsiMemberExt
 import org.jetbrains.plugins.scala.lang.psi.ElementScope
-import org.jetbrains.plugins.scala.lang.psi.impl.ScalaFileImpl
 import org.jetbrains.plugins.scala.lang.refactoring.move.members.ScalaMoveMembersDialog
 import org.junit.Assert
 
@@ -30,7 +29,7 @@ abstract class BaseScalaMoveMemberTest extends ScalaLightPlatformCodeInsightTest
     val member = source.members.find(_.names.contains(memberName)).get
 
     val processor = ScalaMoveMembersDialog.createProcessor(target, member)
-    ScalaFileImpl.performMoveRefactoring(processor.run())
+    processor.run()
 
     FileDocumentManager.getInstance.saveAllDocuments()
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
